@@ -1,14 +1,9 @@
 <?php
-// $script_name = 'app.php';
-// $output_name = 'app.phar';
 
-// $phar = new Phar($output_name);
-// $phar->buildFromDirectory(__DIR__, '/\.(php)$/');
-// $stub = "#!/usr/bin/env php\n" . Phar::createDefaultStub($script_name);
-// $phar->setStub($stub);
-
-// echo $output_name . " created\n";
-// ======================= NEW ============================
+/**
+ * This script is for making a standalone "app.phar" script from the whole app;
+ * And to be ready for the use of package (phpacker) later
+ */
 
 $script_name = 'app.php';
 $output_name = 'app.phar';
