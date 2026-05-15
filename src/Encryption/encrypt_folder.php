@@ -1,5 +1,5 @@
 <?php
-require_once 'helpers.php';
+// require_once 'helpers.php';
 
 function encrypt_folder(string $zip_path, string $passphrase): string|false
 {

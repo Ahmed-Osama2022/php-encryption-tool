@@ -1,5 +1,5 @@
 <?php
-require_once 'helpers.php';
+// require_once 'helpers.php';
 
 function decrypt_folder(string $enc_path, string $passphrase): string|false
 {

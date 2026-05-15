@@ -1,16 +1,14 @@
 #!/usr/bin/env php
 <?php
-require_once 'helpers.php';
+require_once 'vendor/autoload.php';
+// require_once 'helpers.php';
 
-
-
-
-require_once 'choose_folder.php';
-require_once 'compress_folder.php';
-require_once 'decompress_folder.php';
-require_once 'encrypt_folder.php';
-require_once 'decrypt_folder.php';
-require_once 'ask_delete.php';
+// require_once 'choose_folder.php';
+// require_once 'compress_folder.php';
+// require_once 'decompress_folder.php';
+// require_once 'encrypt_folder.php';
+// require_once 'decrypt_folder.php';
+// require_once 'ask_delete.php';
 
 /**
  * Let's define the main 3 functions
@@ -21,6 +19,9 @@ require_once 'ask_delete.php';
  * 5- ask_delete()
  */
 // The main app function 
+
+// define('ROOT_DIR', __DIR__);
+// inspect(ROOT_DIR);
 function app(): void
 {
   echo "\n=== 👋 Welcome to folder Encrypt/Decrypt Tool 👋 ===\n";

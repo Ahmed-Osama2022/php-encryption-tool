@@ -1,11 +1,13 @@
 <?php
-require_once '../helpers.php';
+// require_once '../helpers.php';
 
 function scan_directory()
 {
   // 1- Get the working directory
-  // $current_folder = getcwd(); // BUG:
-  $current_folder = __DIR__;
+  $current_folder = getcwd(); // To be based on your current terminal session (Helpful if wnated to use globally)
+  // || OR || 
+  // $current_folder = ROOT_DIR; // 
+  // inspect($current_folder);
 
   // 2- Scan the current directory for folders
   $files = scandir($current_folder);

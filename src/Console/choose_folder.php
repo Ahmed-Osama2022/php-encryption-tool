@@ -1,7 +1,7 @@
 <?php
-require_once 'helpers.php';
-require_once 'scan_directory.php';
-
+// require_once 'helpers.php';
+// require_once 'scan_directory.php';
+// 
 function choose_folder()
 {
   // 1- Get the working directory

@@ -1,11 +1,12 @@
 <?php
-require_once '../helpers.php';
-require_once 'scan_directory.php';
+// require_once '../helpers.php';
+// require_once 'scan_directory.php';
 
 function compress_folder(string $folder_path = '.git')
 {
 
-  $zipPath       = __DIR__ .  "/$folder_path" . '.zip';
+  // $zipPath       = __DIR__ .  "/$folder_path" . '.zip'; // OLD 
+  $zipPath = getcwd() . "/$folder_path" . '.zip'; // In order to be able to use it globally
   // inspect($zipPath);
   // $zipPath       = '/tmp/archive.zip';
   // $encryptedPath = '/tmp/archive.enc';

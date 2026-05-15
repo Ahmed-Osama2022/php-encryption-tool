@@ -20,7 +20,8 @@ function inspect($data)
  */
 function choose_enc_file(): string|false
 {
-  $files = glob(__DIR__ . '/*.enc');
+  // $files = glob(__DIR__ . '/*.enc');
+  $files = glob(getcwd() . '/*.enc'); // To use it globally
 
   if (empty($files)) {
     echo "❌ No encrypted files found in current directory.\n";
