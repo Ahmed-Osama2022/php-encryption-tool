@@ -1,6 +1,6 @@
 {
   "name": "ahmed-osama2022/php-encryption-tool",
-  "description": "A CLI tool to compress, encrypt and decrypt folders",
+  "description": "A CLI tool to encrypt and decrypt folders in your system",
   "type": "library",
   "authors": [
     {
