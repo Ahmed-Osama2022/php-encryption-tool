@@ -1,26 +1,32 @@
 <?php
 require_once 'helpers.php';
+require_once 'scan_directory.php';
 
-
-function compress_folder(?string $folder_path = '.gjflkkjdskjdkls')
+function compress_folder(string $folder_path = '.git')
 {
-
 
   $zipPath       = __DIR__ .  "/$folder_path" . '.zip';
   // inspect($zipPath);
   // $zipPath       = '/tmp/archive.zip';
-  $encryptedPath = '/tmp/archive.enc';
-  $restoredPath  = '/tmp/restored.zip';
+  // $encryptedPath = '/tmp/archive.enc';
+  // $restoredPath  = '/tmp/restored.zip';
   // $folderToZip   = '/path/to/your/folder';
 
   $folderToZip = $folder_path;
+
+  // Check if the folder exists 
+  $folderToZip = realpath($folder_path);
+  // inspect($folderToZip);
+
+  if ($folderToZip === false || !is_dir($folderToZip)) {
+    echo "❌ The folder '$folder_path' does not exist or is not a valid directory.\n";
+    return;
+  }
 
   // ─────────────────────────────────────────
   // STEP 1: Zip the folder
   // ─────────────────────────────────────────
   $zip = new ZipArchive();
-  // $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
 
   if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
     die("Cannot create zip file");
@@ -46,6 +52,8 @@ function compress_folder(?string $folder_path = '.gjflkkjdskjdkls')
   }
   $zip->close();
 
+  echo "✅ Folder compressed to: $zipPath\n";
+  return $zipPath;
 
 
   // // ─────────────────────────────────────────
@@ -74,4 +82,4 @@ function compress_folder(?string $folder_path = '.gjflkkjdskjdkls')
 
 
 // TEST: 
-compress_folder();
+// compress_folder();

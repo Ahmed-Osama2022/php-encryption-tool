@@ -2,6 +2,8 @@
 <?php
 require_once 'helpers.php';
 require_once 'choose_folder.php';
+require_once 'compress_folder.php';
+require_once 'decompress_folder.php';
 require_once 'encrypt_folder.php';
 require_once 'decrypt_folder.php';
 require_once 'ask_delete.php';
@@ -15,44 +17,62 @@ require_once 'ask_delete.php';
  * 5- ask_delete()
  */
 // The main app function 
-function app()
+function app(): void
 {
-  // 1- Let the user choose what did he want to do? (Encrypt | Decrypt | Exit)
   echo "\n=== 👋 Welcome to folder Encrypt/Decrypt Tool 👋 ===\n";
-  // echo "Choose what you want to do:\n";
-  echo "1. 🔒 Encrypt a folder 🔒\n";
+  echo "1. 🔒🔐 Encrypt a folder 🔐🔒\n";
   echo "2. 🔓 Decrypt a folder 🔓\n";
-  echo "3. 👋 Exit 👋\n";
-  echo "Choose an option (1, 2, 3): \n";
+  echo "3. 👋 Exit\n";
+  echo "Choose an option (1, 2, 3): ";
   $choice = trim(fgets(STDIN));
 
   if ($choice == '1') {
+    echo "\n=========================\n";
+    echo "🔒🔐 === Encryption === 🔐🔒\n";
     echo "=========================\n";
-    echo "🔒 === Encryption === 🔒\n";
-    echo "=========================";
-    $folder = choose_folder();
-    // inspect($folder);
 
-    echo "📂 Selected folder: " . "($folder)\n";
+    $folder    = choose_folder();
+    echo "📂 Selected folder: ($folder)\n";
     echo "Enter passphrase: ";
     $keyphrase = trim(fgets(STDIN));
-    // inspect($keyphrase); //TEST: 
-    encrypt_folder($folder, $keyphrase);
+
+    $zipPath = compress_folder($folder);
+    if ($zipPath !== false) {
+      encrypt_folder($zipPath, $keyphrase);
+      ask_delete($folder); // delete original folder?
+    }
   } elseif ($choice == '2') {
-    echo "=========================\n";
+    echo "\n=========================\n";
     echo "🔓 === Decryption === 🔓\n";
-    echo "=========================";
-    $folder = choose_folder();
-    echo "📂 Selected folder: " . "($folder)\n";
-    echo "Enter passphrase: ";
+    echo "=========================\n";
 
+    $encFile = choose_enc_file();
+    if ($encFile === false) {
+      return;
+    }
+
+    echo "🔐 Selected file: ($encFile)\n";
+    echo "Enter passphrase: ";
     $keyphrase = trim(fgets(STDIN));
-    decrypt_folder($folder, $keyphrase);
+    decrypt_folder($encFile, $keyphrase);
+
+    $zipPath = decrypt_folder($encFile, $keyphrase);
+    if ($zipPath !== false) {
+      decompress_folder($zipPath);
+      ask_delete($encFile); // delete the .enc file?
+    }
+
+    // $folder    = choose_folder();
+    // echo "📂 Selected folder: ($folder)\n";
+    // echo "Enter passphrase: ";
+    // $keyphrase = trim(fgets(STDIN));
+
+    // decrypt_folder($folder, $keyphrase);
   } elseif ($choice == '3') {
     echo "👋 Exiting...\n";
     exit();
   } else {
-    echo "❌ Invalid choice. Please try again. ❌\n";
+    echo "❌ Invalid choice. Please try again.\n";
     sleep(1);
     app();
   }
@@ -65,8 +85,3 @@ die();
 // Get the user input
 // echo "Enter your folder name you want to compress it: ";
 // $input = fgets(STDIN);
-
-
-
-
-?>

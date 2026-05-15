@@ -2,3 +2,6 @@
 *.py
 notes.*
 NOTES.*
+*.bak
+test
+*.enc

@@ -1,32 +1,26 @@
 <?php
 require_once 'helpers.php';
 
-
-
-
-function encrypt_folder(string $folder_path, string $passphrase)
+function encrypt_folder(string $zip_path, string $passphrase): string|false
 {
+  if (!file_exists($zip_path)) {
+    echo "❌ Zip file not found: '$zip_path'.\n";
+    return false;
+  }
 
-  // // ─────────────────────────────────────────
-  // // STEP 2: Encrypt the zip
-  // // ─────────────────────────────────────────
-  // $key = random_bytes(32);
-  // $iv  = random_bytes(16);
+  $encryptedPath = preg_replace('/\.zip$/', '.enc', $zip_path);
 
-  // $plaintext  = file_get_contents($zipPath);
-  // $ciphertext = openssl_encrypt($plaintext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+  $salt       = random_bytes(16);
+  $key        = hash_pbkdf2('sha256', $passphrase, $salt, 100_000, 32, true);
+  $iv         = random_bytes(16);
 
-  // file_put_contents($encryptedPath, $iv . $ciphertext);
-  // unlink($zipPath); // remove unencrypted zip
+  $plaintext  = file_get_contents($zip_path);
+  $ciphertext = openssl_encrypt($plaintext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
 
-  // // ─────────────────────────────────────────
-  // // STEP 3: Decrypt
-  // // ─────────────────────────────────────────
-  // $raw        = file_get_contents($encryptedPath);
-  // $iv         = substr($raw, 0, 16);
-  // $ciphertext = substr($raw, 16);
+  // File layout: [16 bytes salt][16 bytes IV][ciphertext]
+  file_put_contents($encryptedPath, $salt . $iv . $ciphertext);
+  unlink($zip_path);
 
-  // $plaintext = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
-
-  // file_put_contents($restoredPath, $plaintext);
+  echo "✅ Encrypted to: $encryptedPath\n";
+  return $encryptedPath;
 }

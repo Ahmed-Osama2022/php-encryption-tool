@@ -2,7 +2,6 @@
 require_once 'helpers.php';
 require_once 'scan_directory.php';
 
-
 function choose_folder()
 {
   // 1- Get the working directory
@@ -36,7 +35,6 @@ function choose_folder()
   }
 
   $folder = $directories[$choice - 1];
-  // echo "Selected folder: " . $folder;
 
   return $folder;
 }
