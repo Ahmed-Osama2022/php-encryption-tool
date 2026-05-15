@@ -1,6 +1,10 @@
 #!/usr/bin/env php
 <?php
 require_once 'helpers.php';
+
+
+
+
 require_once 'choose_folder.php';
 require_once 'compress_folder.php';
 require_once 'decompress_folder.php';

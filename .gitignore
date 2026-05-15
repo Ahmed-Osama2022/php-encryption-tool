@@ -1,7 +1,8 @@
-.vscode/*
+/.vscode/
 *.py
 notes.*
 NOTES.*
 *.bak
 test
 *.enc
+/vendor/

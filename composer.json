@@ -1,0 +1,22 @@
+{
+  "name": "ahmed/php-encryption-tool",
+  "description": "A CLI tool to compress, encrypt and decrypt folders",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Ahmed-Osama2022",
+      "email": "ahmadosama.2011@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    },
+    "files": [
+      "helpers.php"
+    ]
+  }
+}

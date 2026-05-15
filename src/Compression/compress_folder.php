@@ -1,5 +1,5 @@
 <?php
-require_once 'helpers.php';
+require_once '../helpers.php';
 require_once 'scan_directory.php';
 
 function compress_folder(string $folder_path = '.git')
