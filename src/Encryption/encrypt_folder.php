@@ -1,6 +1,14 @@
 <?php
 // require_once 'helpers.php';
 
+/**
+ * Encrypt a zip file
+ * 
+ * @param string $zip_path
+ * @param string $passphrase
+ * 
+ * @return string|false
+ */
 function encrypt_folder(string $zip_path, string $passphrase): string|false
 {
   if (!file_exists($zip_path)) {

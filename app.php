@@ -2,7 +2,6 @@
 <?php
 require_once 'vendor/autoload.php';
 // require_once 'helpers.php';
-
 // require_once 'choose_folder.php';
 // require_once 'compress_folder.php';
 // require_once 'decompress_folder.php';
@@ -10,18 +9,9 @@ require_once 'vendor/autoload.php';
 // require_once 'decrypt_folder.php';
 // require_once 'ask_delete.php';
 
-/**
- * Let's define the main 3 functions
- * 1- Encrption core (Algorithm and all the stuff related) 
- * 2- main() || app()
- * 3- encrypt_folder()
- * 4- decrypt_folder()
- * 5- ask_delete()
- */
-// The main app function 
-
 // define('ROOT_DIR', __DIR__);
 // inspect(ROOT_DIR);
+// The main app function 
 function app(): void
 {
   echo "\n=== 👋 Welcome to folder Encrypt/Decrypt Tool 👋 ===\n";
@@ -66,13 +56,6 @@ function app(): void
       decompress_folder($zipPath);
       ask_delete($encFile); // delete the .enc file?
     }
-
-    // $folder    = choose_folder();
-    // echo "📂 Selected folder: ($folder)\n";
-    // echo "Enter passphrase: ";
-    // $keyphrase = trim(fgets(STDIN));
-
-    // decrypt_folder($folder, $keyphrase);
   } elseif ($choice == '3') {
     echo "👋 Exiting...\n";
     exit();
@@ -85,8 +68,4 @@ function app(): void
 
 app();
 
-die();
-
-// Get the user input
-// echo "Enter your folder name you want to compress it: ";
-// $input = fgets(STDIN);
+// die();
