@@ -21,5 +21,8 @@
       "src/Encryption/encrypt_folder.php",
       "src/Encryption/decrypt_folder.php"
     ]
+  },
+  "require-dev": {
+    "phpacker/phpacker": "^0.6.4"
   }
 }

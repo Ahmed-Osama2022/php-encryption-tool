@@ -6,3 +6,8 @@ NOTES.*
 test
 *.enc
 /vendor/
+NOTES.md
+Notes.md
+*.sh
+/build/
+*.phar
