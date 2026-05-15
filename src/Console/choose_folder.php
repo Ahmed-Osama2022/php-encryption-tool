@@ -6,7 +6,7 @@ function choose_folder()
 {
   // 1- Get the working directory
   $directories = scan_directory();
-  inspect($directories);
+  // inspect($directories);
 
   if (empty($directories)) {
     echo "❌ No folders found in the current directory. ❌\n";
