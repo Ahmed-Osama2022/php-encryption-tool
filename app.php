@@ -34,7 +34,8 @@ function app(): void
     $zipPath = compress_folder($folder);
     if ($zipPath !== false) {
       encrypt_folder($zipPath, $keyphrase);
-      ask_delete($folder); // delete original folder?
+      // ask_delete($folder); // delete original folder?
+      ask_delete(getcwd() . DIRECTORY_SEPARATOR . $folder); // delete original folder? (Better approach)
     }
   } elseif ($choice == '2') {
     echo "\n=========================\n";
@@ -55,6 +56,7 @@ function app(): void
     if ($zipPath !== false) {
       decompress_folder($zipPath);
       ask_delete($encFile); // delete the .enc file?
+      // ask_delete(getcwd() . DIRECTORY_SEPARATOR . $encFile); // delete the .enc file?
     }
   } elseif ($choice == '3') {
     echo "👋 Exiting...\n";
