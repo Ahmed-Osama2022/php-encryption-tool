@@ -78,3 +78,31 @@ function ask_delete(string $file_path): void
     echo "✅ Kept original: $file_path\n";
   }
 }
+
+/**
+ * Increment the IV
+ * 
+ * @param string $iv The IV to increment
+ * 
+ * @return strings
+ */
+function increment_iv(string $iv): string
+{
+  $bytes = str_split($iv);
+
+  // Walk the IV from right to left (like incrementing a number)
+  for ($position = 15; $position >= 0; $position--) {
+    $currentByte = ord($bytes[$position]);
+
+    // If not at max value, just increment and stop
+    if ($currentByte < 255) {
+      $bytes[$position] = chr($currentByte + 1);
+      break;
+    }
+
+    // Overflow: reset to 0 and carry over to the next byte
+    $bytes[$position] = chr(0);
+  }
+
+  return implode('', $bytes);
+}

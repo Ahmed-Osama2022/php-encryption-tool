@@ -16,21 +16,35 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
     return false;
   }
 
-  $raw        = file_get_contents($enc_path);
-  $salt       = substr($raw, 0, 16);
-  $iv         = substr($raw, 16, 16);
-  $ciphertext = substr($raw, 32);
+  $in = fopen($enc_path, 'rb');
 
-  $key       = hash_pbkdf2('sha256', $passphrase, $salt, 100_000, 32, true);
-  $plaintext = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+  // Read header: [16 bytes salt][16 bytes IV]
+  $salt = fread($in, 16);
+  $iv   = fread($in, 16);
 
-  if ($plaintext === false) {
-    echo "❌ Decryption failed. Wrong passphrase?\n";
-    return false;
-  }
+  $key = hash_pbkdf2('sha256', $passphrase, $salt, 100_000, 32, true);
 
   $zipPath = preg_replace('/\.enc$/', '.zip', $enc_path);
-  file_put_contents($zipPath, $plaintext);
+  $out     = fopen($zipPath, 'wb');
+
+  while (!feof($in)) {
+    $chunk     = fread($in, 8192);
+    $plaintext = openssl_decrypt($chunk, 'AES-256-CTR', $key, OPENSSL_RAW_DATA, $iv);
+
+    if ($plaintext === false) {
+      fclose($in);
+      fclose($out);
+      unlink($zipPath);
+      echo "❌ Decryption failed. Wrong passphrase?\n";
+      return false;
+    }
+
+    fwrite($out, $plaintext);
+    $iv = increment_iv($iv);
+  }
+
+  fclose($in);
+  fclose($out);
 
   echo "✅ Decrypted zip at: $zipPath\n";
   return $zipPath;

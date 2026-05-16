@@ -18,15 +18,27 @@ function encrypt_folder(string $zip_path, string $passphrase): string|false
 
   $encryptedPath = preg_replace('/\.zip$/', '.enc', $zip_path);
 
-  $salt       = random_bytes(16);
-  $key        = hash_pbkdf2('sha256', $passphrase, $salt, 100_000, 32, true);
-  $iv         = random_bytes(16);
+  $salt = random_bytes(16);
+  $key  = hash_pbkdf2('sha256', $passphrase, $salt, 100_000, 32, true);
+  $iv   = random_bytes(16);
 
-  $plaintext  = file_get_contents($zip_path);
-  $ciphertext = openssl_encrypt($plaintext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+  $in  = fopen($zip_path, 'rb');
+  $out = fopen($encryptedPath, 'wb');
 
-  // File layout: [16 bytes salt][16 bytes IV][ciphertext]
-  file_put_contents($encryptedPath, $salt . $iv . $ciphertext);
+  // Write header: [16 bytes salt][16 bytes IV]
+  fwrite($out, $salt . $iv);
+
+  while (!feof($in)) {
+    $chunk      = fread($in, 8192); // 8KB at a time
+    $ciphertext = openssl_encrypt($chunk, 'AES-256-CTR', $key, OPENSSL_RAW_DATA, $iv);
+    fwrite($out, $ciphertext);
+
+    // Increment IV to keep CTR mode correct across chunks
+    $iv = increment_iv($iv);
+  }
+
+  fclose($in);
+  fclose($out);
   unlink($zip_path);
 
   echo "✅ Encrypted to: $encryptedPath\n";

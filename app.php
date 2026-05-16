@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+// ini_set('memory_limit', '-1');
+
 require_once 'vendor/autoload.php';
 // require_once 'helpers.php';
 // require_once 'choose_folder.php';
