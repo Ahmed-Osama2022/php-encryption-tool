@@ -7,7 +7,7 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
   }
 
   $fileSize   = filesize($enc_path);
-  $headerSize = SODIUM_CRYPTO_PWHASH_SALTBYTES + 16; // 32 bytes: salt + IV
+  $headerSize = 16 + 16; // salt + IV
   $hmacSize   = 32;
   $cipherSize = $fileSize - $headerSize - $hmacSize;
 
@@ -17,16 +17,16 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
   }
 
   $in   = fopen($enc_path, 'rb');
-  $salt = fread($in, SODIUM_CRYPTO_PWHASH_SALTBYTES);
+  $salt = fread($in, 16);
   $iv   = fread($in, 16);
 
   $key = sodium_crypto_pwhash(
     32,
     $passphrase,
     $salt,
-    SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
-    SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE,
-    SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
+    2,          // SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE
+    67108864,   // SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE — 64MB
+    2           // SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
   );
 
   // --- Pass 1: verify HMAC over ciphertext (streaming) ---

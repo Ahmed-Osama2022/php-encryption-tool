@@ -9,14 +9,14 @@ function encrypt_folder(string $zip_path, string $passphrase): string|false
   $encryptedPath = preg_replace('/\.zip$/', '.enc', $zip_path);
 
   // Argon2id — memory-hard, GPU-resistant
-  $salt = random_bytes(SODIUM_CRYPTO_PWHASH_SALTBYTES); // 16 bytes
+  $salt = random_bytes(16);
   $key  = sodium_crypto_pwhash(
     32,
     $passphrase,
     $salt,
-    SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
-    SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE,
-    SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
+    2,          // SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE
+    67108864,   // SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE — 64MB
+    2           // SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
   );
 
   $iv  = random_bytes(16);
