@@ -6,34 +6,37 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
     return false;
   }
 
-  $fileSize = filesize($enc_path);
-
-  // Layout: [16 salt][16 IV][ciphertext][32 HMAC]
-  $headerSize   = 16 + 16;       // 32 bytes
-  $hmacSize     = 32;
-  $cipherSize   = $fileSize - $headerSize - $hmacSize;
+  $fileSize   = filesize($enc_path);
+  $headerSize = SODIUM_CRYPTO_PWHASH_SALTBYTES + 16; // 32 bytes: salt + IV
+  $hmacSize   = 32;
+  $cipherSize = $fileSize - $headerSize - $hmacSize;
 
   if ($cipherSize <= 0) {
     echo "❌ File too small to be valid.\n";
     return false;
   }
 
-  $in = fopen($enc_path, 'rb');
-
-  $salt = fread($in, 16);
+  $in   = fopen($enc_path, 'rb');
+  $salt = fread($in, SODIUM_CRYPTO_PWHASH_SALTBYTES);
   $iv   = fread($in, 16);
 
-  $key = hash_pbkdf2('sha256', $passphrase, $salt, 100_000, 32, true);
+  $key = sodium_crypto_pwhash(
+    32,
+    $passphrase,
+    $salt,
+    SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
+    SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE,
+    SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
+  );
 
-  // Verify HMAC by streaming ciphertext (memory efficient)
+  // --- Pass 1: verify HMAC over ciphertext (streaming) ---
   $hmacCtx   = hash_init('sha256', HASH_HMAC, $key);
   $remaining = $cipherSize;
 
   while ($remaining > 0) {
-    $chunkSize = min(8192, $remaining);
-    $chunk     = fread($in, $chunkSize);
+    $chunk = fread($in, min(8192, $remaining));
     hash_update($hmacCtx, $chunk);
-    $remaining -= $chunkSize;
+    $remaining -= strlen($chunk);
   }
 
   $computedHmac = hash_final($hmacCtx, true);
@@ -41,28 +44,29 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
 
   if (!hash_equals($storedHmac, $computedHmac)) {
     fclose($in);
+    sodium_memzero($key);
     echo "❌ Wrong passphrase or corrupted file.\n";
     return false;
   }
 
-  // HMAC verified — now decrypt
-  fseek($in, $headerSize); // rewind to start of ciphertext
+  // --- Pass 2: decrypt (HMAC verified — safe to proceed) ---
+  fseek($in, $headerSize);
   $remaining = $cipherSize;
 
   $zipPath = preg_replace('/\.enc$/', '.zip', $enc_path);
   $out     = fopen($zipPath, 'wb');
 
   while ($remaining > 0) {
-    $chunkSize = min(8192, $remaining);
-    $chunk     = fread($in, $chunkSize);
+    $chunk     = fread($in, min(8192, $remaining));
     $plaintext = openssl_decrypt($chunk, 'AES-256-CTR', $key, OPENSSL_RAW_DATA, $iv);
     fwrite($out, $plaintext);
     $iv = increment_iv($iv);
-    $remaining -= $chunkSize;
+    $remaining -= strlen($chunk);
   }
 
   fclose($in);
   fclose($out);
+  sodium_memzero($key);
 
   echo "✅ Decrypted zip at: $zipPath\n";
   return $zipPath;
