@@ -52,7 +52,6 @@ function app(): void
     echo "🔐 Selected file: ($encFile)\n";
     echo "Enter passphrase: ";
     $keyphrase = trim(fgets(STDIN));
-    decrypt_folder($encFile, $keyphrase);
 
     $zipPath = decrypt_folder($encFile, $keyphrase);
     if ($zipPath !== false) {

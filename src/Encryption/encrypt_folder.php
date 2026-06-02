@@ -1,14 +1,4 @@
 <?php
-// require_once 'helpers.php';
-
-/**
- * Encrypt a zip file
- * 
- * @param string $zip_path
- * @param string $passphrase
- * 
- * @return string|false
- */
 function encrypt_folder(string $zip_path, string $passphrase): string|false
 {
   if (!file_exists($zip_path)) {
@@ -25,17 +15,22 @@ function encrypt_folder(string $zip_path, string $passphrase): string|false
   $in  = fopen($zip_path, 'rb');
   $out = fopen($encryptedPath, 'wb');
 
-  // Write header: [16 bytes salt][16 bytes IV]
+  // Header: [16 bytes salt][16 bytes IV]
   fwrite($out, $salt . $iv);
 
+  $hmacCtx = hash_init('sha256', HASH_HMAC, $key); // incremental HMAC
+
   while (!feof($in)) {
-    $chunk      = fread($in, 8192); // 8KB at a time
+    $chunk      = fread($in, 8192);
     $ciphertext = openssl_encrypt($chunk, 'AES-256-CTR', $key, OPENSSL_RAW_DATA, $iv);
     fwrite($out, $ciphertext);
-
-    // Increment IV to keep CTR mode correct across chunks
+    hash_update($hmacCtx, $ciphertext); // feed ciphertext into HMAC
     $iv = increment_iv($iv);
   }
+
+  // Append 32-byte HMAC at the end
+  $hmac = hash_final($hmacCtx, true);
+  fwrite($out, $hmac);
 
   fclose($in);
   fclose($out);
