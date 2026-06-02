@@ -32,10 +32,23 @@ function choose_enc_file(): string|false
   echo "\nAvailable encrypted files:\n";
   foreach ($files as $i => $file) {
     echo ($i + 1) . ". " . basename($file) . "\n";
+
+    if ($i + 1 === count($files)) {
+      echo "------------------------------------------------\n";
+      // echo count($files) + 1 . ") " . "(Q || q) to quit\n";
+      echo "X) " . "(Q || q) to quit\n";
+    }
   }
 
   echo "Choose a file: ";
-  $choice = (int) trim(fgets(STDIN));
+  $choice = (string) trim(fgets(STDIN));
+
+  // Add another option to always exit the app
+  if ($choice === 'Q' || $choice === 'q') {
+    echo "👋 Exiting...\n";
+    return false;
+  }
+
 
   if ($choice < 1 || $choice > count($files)) {
     echo "❌ Invalid choice.\n";

@@ -22,12 +22,23 @@ function choose_folder()
   echo "Choose a folder:\n";
   foreach ($directories as $key => $directory) {
     echo $key + 1 . ") " . $directory . "\n";
+
+    if ($key + 1 === count($directories)) {
+      echo "------------------------------------------------\n";
+      // echo count($directories) + 1 . ") " . "(Q || q) to quit\n";
+      echo "X) " . "(Q || q) to quit\n";
+    }
   }
   // inspect($directories);
 
   // 5- Get the user input
   // $choice = fgets(STDIN); // BUG:
-  $choice = (int) trim(fgets(STDIN));
+  $choice = (string) trim(fgets(STDIN));
+  // Add another option to always exit the app
+  if ($choice === 'q' || $choice === 'Q') {
+    echo "👋 Exiting...\n";
+    exit();
+  }
 
   if ($choice < 1 || $choice > count($directories)) {
     echo "❌ Invalid choice. Please try again. ❌\n";
