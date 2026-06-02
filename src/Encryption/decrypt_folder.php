@@ -20,14 +20,7 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
   $salt = fread($in, 16);
   $iv   = fread($in, 16);
 
-  $key = sodium_crypto_pwhash(
-    32,
-    $passphrase,
-    $salt,
-    2,          // SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE
-    67108864,   // SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE — 64MB
-    2           // SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
-  );
+  $key = hash_pbkdf2('sha256', $passphrase, $salt, 600_000, 32, true);
 
   // --- Pass 1: verify HMAC over ciphertext (streaming) ---
   $hmacCtx   = hash_init('sha256', HASH_HMAC, $key);
@@ -44,7 +37,6 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
 
   if (!hash_equals($storedHmac, $computedHmac)) {
     fclose($in);
-    sodium_memzero($key);
     echo "❌ Wrong passphrase or corrupted file.\n";
     return false;
   }
@@ -66,7 +58,6 @@ function decrypt_folder(string $enc_path, string $passphrase): string|false
 
   fclose($in);
   fclose($out);
-  sodium_memzero($key);
 
   echo "✅ Decrypted zip at: $zipPath\n";
   return $zipPath;

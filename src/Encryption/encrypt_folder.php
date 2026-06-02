@@ -8,18 +8,10 @@ function encrypt_folder(string $zip_path, string $passphrase): string|false
 
   $encryptedPath = preg_replace('/\.zip$/', '.enc', $zip_path);
 
-  // Argon2id — memory-hard, GPU-resistant
   $salt = random_bytes(16);
-  $key  = sodium_crypto_pwhash(
-    32,
-    $passphrase,
-    $salt,
-    2,          // SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE
-    67108864,   // SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE — 64MB
-    2           // SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
-  );
+  $key  = hash_pbkdf2('sha256', $passphrase, $salt, 600_000, 32, true);
+  $iv   = random_bytes(16);
 
-  $iv  = random_bytes(16);
   $in  = fopen($zip_path, 'rb');
   $out = fopen($encryptedPath, 'wb');
 
@@ -42,11 +34,8 @@ function encrypt_folder(string $zip_path, string $passphrase): string|false
 
   fclose($in);
   fclose($out);
-
-  // Zero out key from memory
-  sodium_memzero($key);
-
   unlink($zip_path);
+
   echo "✅ Encrypted to: $encryptedPath\n";
   return $encryptedPath;
 }
